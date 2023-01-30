@@ -1,7 +1,7 @@
 import torch
 
 class MatMul:
-    def __init__(self, W):
+    def __init__(self, W, b):
         self.params = [W]
         self.grads = [torch.zeros_like(W)]
         self.x = None
@@ -17,21 +17,62 @@ class MatMul:
         dx = torch.mm(dout, W.T)
         dW = torch.mm(self.x.T, dout)
         self.grads[0] = dW.clone()
-        return dW
+        return dx
+
+
+class Sigmoid:
+    def __init__(self, W, b):
+        self.params = []
+        self.grads = []
+        self.out = None
+    
+    def forward(self, x):
+        out = 1 / (1 + torch.exp(-x))
+        self.out = out
+        return out
+
+    def backward(self, dout):
+        dx = dout * (1.0 - self.out) * self.out
+        return dx
+
+
+class Affine:
+    def __init__(self, W, b):
+        self.params = [W, b]
+        self.grads = [torch.zeros_like(W), torch.zeros_like(b)]
+        self.x = None
+
+    def forward(self, x):
+        W, b = self.params
+        out = torch.mm(x, W) + b
+        self.x = x
+        return out
+
+    def backward(self, dout):
+        W, b = self.params
+        dx = torch.mm(dout, W.T)
+        dW = torch.mm(self.x.T, dout)
+        db = torch.sum(dout, dim = 0)
+        self.grads[0] = dW.clone()
+        self.grads[1] = db.clone()
+        return dx
+
 
 if __name__ == '__main__':
     # 创建权重W
     W = torch.tensor([[1., -1.], [1., -1.]], requires_grad=True)
     # 创建输入矩阵x
     x = torch.tensor([[1., 2.], [3., 4.]])
+    # 创建偏置
+    b = torch.tensor(2.)
 
     # 创建MatMul对象
-    matmul = MatMul(W)
+    test = Affine(W, b)
     # 前向传播
-    out = matmul.forward(x)
-    print("out:", out)
+    forward_out = test.forward(x)
+    print("Forward Out:", forward_out)
 
     # 反向传播
-    dout = torch.ones_like(out)
-    matmul.backward(dout)
-    print("W.grad:", matmul.grads)
+    dout = torch.ones_like(forward_out)
+    backward_out = test.backward(dout)
+    print("Backward Out:", backward_out)
