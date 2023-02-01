@@ -1,5 +1,6 @@
 import torch
 
+# layers
 class MatMul:
     def __init__(self, W, b):
         self.params = [W]
@@ -18,23 +19,6 @@ class MatMul:
         dW = torch.mm(self.x.T, dout)
         self.grads[0] = dW.clone()
         return dx
-
-
-class Sigmoid:
-    def __init__(self, W, b):
-        self.params = []
-        self.grads = []
-        self.out = None
-    
-    def forward(self, x):
-        out = 1 / (1 + torch.exp(-x))
-        self.out = out
-        return out
-
-    def backward(self, dout):
-        dx = dout * (1.0 - self.out) * self.out
-        return dx
-
 
 class Affine:
     def __init__(self, W, b):
@@ -56,8 +40,66 @@ class Affine:
         self.grads[0] = dW.clone()
         self.grads[1] = db.clone()
         return dx
+    
+
+# Activate
+class Sorfmax:
+    def __init__(self):
+        self.grads = []
+        self.x = None
+
+    def forward(self, x):
+        c = x.max()
+        x_exp = torch.exp(x - c)
+        self.x = x_exp / x_exp.sum()
+        return self.x
+
+    def backward(self, dout):
+        """反向传播
+            dout (torch.Tensor): 这里传入的其实是标签
+        """
+        dx = self.x - dout
+        return dx
 
 
+class Sigmoid:
+    def __init__(self, W, b):
+        self.params = []
+        self.grads = []
+        self.out = None
+    
+    def forward(self, x):
+        out = 1 / (1 + torch.exp(-x))
+        self.out = out
+        return out
+
+    def backward(self, dout):
+        dx = dout * (1.0 - self.out) * self.out
+        return dx
+
+# Loss
+class CrossEntropy:
+    def __init__(self) -> None:
+        self.out = None
+        self.t = None
+
+    def forward(self, x, t):
+        self.t = t
+        if x.ndim == 1:
+            t = t.reshape(1, len(t))
+            x = x.reshape(1, len(x))
+
+        # 取行值 
+        batch_size = t.shape[0]
+        self.out = -torch.sum(x * torch.log(t + 1e-7)) / batch_size
+        return self.out
+        
+    def backward(self):
+        return self.t
+
+
+
+# test
 if __name__ == '__main__':
     # 创建权重W
     W = torch.tensor([[1., -1.], [1., -1.]], requires_grad=True)
