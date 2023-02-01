@@ -42,17 +42,26 @@ class Affine:
         return dx
     
 
-# Activate
+# =============Activate=============
+
 class Sorfmax:
     def __init__(self):
         self.grads = []
         self.x = None
 
     def forward(self, x):
-        c = x.max()
-        x_exp = torch.exp(x - c)
-        self.x = x_exp / x_exp.sum()
-        return self.x
+        if x.ndim == 2:
+            c = x.max(dim=1)
+            x_exp = torch.exp(x - c.values.unsqueeze(0).t())
+            self.x = x_exp / x_exp.sum(dim=1).unsqueeze(0).t()
+            return self.x
+        elif x.ndim == 1:
+            t = t.reshape(1, len(t))
+            x = x.reshape(1, len(x))
+            c = x.max()
+            x_exp = torch.exp(x - c)
+            self.x = x_exp / x_exp.sum()
+            return self.x
 
     def backward(self, dout):
         """反向传播
@@ -77,7 +86,8 @@ class Sigmoid:
         dx = dout * (1.0 - self.out) * self.out
         return dx
 
-# Loss
+
+# ===============Loss=============
 class CrossEntropy:
     def __init__(self) -> None:
         self.out = None
@@ -86,14 +96,15 @@ class CrossEntropy:
     def forward(self, x, t):
         self.t = t
         if x.ndim == 1:
+            # 如果维度为1，直接格式化为一行 \
             t = t.reshape(1, len(t))
             x = x.reshape(1, len(x))
 
-        # 取行值 
+        # 取行值 \
         batch_size = t.shape[0]
-        self.out = -torch.sum(x * torch.log(t + 1e-7)) / batch_size
+        self.out = -torch.sum(t * torch.log(x + 1e-7)) / batch_size
         return self.out
-        
+
     def backward(self):
         return self.t
 
@@ -107,9 +118,11 @@ if __name__ == '__main__':
     x = torch.tensor([[1., 2.], [3., 4.]])
     # 创建偏置
     b = torch.tensor(2.)
+    # 创建标签
+    t = torch.tensor([[0, 1], [1, 0]])
 
     # 创建MatMul对象
-    test = Affine(W, b)
+    test = Sorfmax()
     # 前向传播
     forward_out = test.forward(x)
     print("Forward Out:", forward_out)
