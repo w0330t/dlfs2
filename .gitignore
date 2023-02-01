@@ -1,0 +1,97 @@
+Skip to content
+Search or jump to…
+Pull requests
+Issues
+Codespaces
+Marketplace
+Explore
+ 
+@w0330t 
+microsoft
+/
+vscode-python
+Public
+forked from DonJayamanne/pythonVSCode
+Fork your own copy of microsoft/vscode-python
+Code
+Issues
+515
+Pull requests
+6
+Discussions
+Actions
+Wiki
+Security
+Insights
+vscode-python/.gitignore
+@paulacamargo25
+paulacamargo25 Update to new l10n (#20484)
+…
+Latest commit e92c124 3 weeks ago
+ History
+ 10 contributors
+@DonJayamanne@ericsnowcurrently@jakebailey@brettcannon@rchiodo@paulacamargo25@TylerLeonhardt@karthiknadig@d3r3kk@int19h
+48 lines (48 sloc)  700 Bytes
+
+.DS_Store
+.huskyrc.json
+out
+log.log
+**/node_modules
+*.pyc
+*.vsix
+**/.vscode/.ropeproject/**
+**/testFiles/**/.cache/**
+*.noseids
+.nyc_output
+.vscode-test
+__pycache__
+npm-debug.log
+**/.mypy_cache/**
+!yarn.lock
+coverage/
+cucumber-report.json
+**/.vscode-test/**
+**/.vscode test/**
+**/.vscode-smoke/**
+**/.venv*/
+port.txt
+precommit.hook
+pythonFiles/lib/**
+debug_coverage*/**
+languageServer/**
+languageServer.*/**
+bin/**
+obj/**
+.pytest_cache
+tmp/**
+.python-version
+.vs/
+test-results*.xml
+xunit-test-results.xml
+build/ci/performance/performance-results.json
+!build/
+debug*.log
+debugpy*.log
+pydevd*.log
+nodeLanguageServer/**
+nodeLanguageServer.*/**
+dist/**
+# translation files
+*.xlf
+package.nls.*.json
+l10n/
+Footer
+© 2023 GitHub, Inc.
+Footer navigation
+Terms
+Privacy
+Security
+Status
+Docs
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
