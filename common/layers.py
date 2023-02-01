@@ -72,7 +72,7 @@ class Sorfmax:
 
 
 class Sigmoid:
-    def __init__(self, W, b):
+    def __init__(self):
         self.params = []
         self.grads = []
         self.out = None
