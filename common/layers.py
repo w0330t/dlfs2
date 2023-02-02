@@ -46,6 +46,7 @@ class Affine:
 
 class Sorfmax:
     def __init__(self):
+        self.params = []
         self.grads = []
         self.x = None
 
