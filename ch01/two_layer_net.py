@@ -49,4 +49,7 @@ class TwoLayerNet:
 
 
 if __name__ == '__main__':
-    tln = TwoLayerNet(1, 2, 3)
+    # tln = TwoLayerNet(2, 2, 2)
+    # tln.forward(2, 2)
+    # tln.backward()
+    pass

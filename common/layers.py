@@ -106,7 +106,7 @@ class CrossEntropy:
         self.out = -torch.sum(t * torch.log(x + 1e-7)) / batch_size
         return self.out
 
-    def backward(self):
+    def backward(self, dout):
         return self.t
 
 
