@@ -69,15 +69,4 @@ for epoch in range(max_epoch):
         model.train(batch_x, batch_t, data_size)
 
 
-        # total_loss += loss
-        # loss_count += 1
-
-        # 5.定期输出学习过程
-        # if (iters+1) % 10 == 0:
-        #     avg_loss = total_loss / loss_count
-        #     print('| epoch %d |  iter %d / %d | loss %.2f'              
-        #         % (epoch + 1, iters + 1, max_iters, avg_loss))
-        #     loss_list.append(avg_loss)
-        #     total_loss, loss_count = 0, 0
-
 model.plot_progress()

@@ -31,7 +31,8 @@ class TwoLayerNet(nn.Module):
         # 定义神经网络层
         self.model = nn.Sequential(
             linear1,
-            nn.Sigmoid(),
+            # nn.Sigmoid(),
+            nn.LeakyReLU(0.02),
             linear2,
             # nn.Softmax()
         )
@@ -76,6 +77,6 @@ class TwoLayerNet(nn.Module):
 
     def plot_progress(self):
         df = pandas.DataFrame(self.progress, columns=['loss'])
-        df.plot(ylim=(0, 1.2), figsize=(16,8), alpha=0.3, 
-            marker='.', grid=True, yticks=(0, 0.25, 0.5))
+        df.plot(ylim=(0, 1.3), figsize=(16,8), alpha=0.3, 
+            marker='.', grid=True, yticks=(0, 0.25, 0.5, 0.75, 1, 1.25))
         plt.show()
