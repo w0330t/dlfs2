@@ -66,7 +66,7 @@ for epoch in range(max_epoch):
         batch_t = t[iters * batch_size: (iters + 1) * batch_size]
 
         # 4.计算梯度，更新参数
-        model.train(batch_x, batch_t, data_size)
+        model.train(batch_x, batch_t, iters, epoch, max_iters)
 
 
 model.plot_progress()

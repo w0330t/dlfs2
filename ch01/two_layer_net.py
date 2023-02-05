@@ -46,8 +46,11 @@ class TwoLayerNet(nn.Module):
 
         
         # 计数器和进程记录        
-        self.counter = 0        
-        self.progress = []
+        self.counter = 0
+        self.total_loss = 0
+        self.loss_count = 0  
+        self.loss_list = []
+
 
 
     def forward(self, inputs):
@@ -55,28 +58,35 @@ class TwoLayerNet(nn.Module):
         return self.model(inputs)
 
     
-    def train(self, inputs, targets, progress):
+    def train(self, inputs, targets, iters, epoch, max_iters):
         # 计算网络的输出
         outputs = self.forward(inputs)
         
         # 计算损失值
         loss = self.loss_function(outputs, targets)
         
-        # 每训练10次增加计数器
-        self.counter += 1
-        if (self.counter % 10 == 0):
-            self.progress.append(loss.item())
-        if (self.counter % progress == 0):
-            print("counter = ", self.counter)
             
         # 归零梯度，反向传播，更新权重
         self.optimiser.zero_grad()
         loss.backward()
         self.optimiser.step()
 
+        
+        self.total_loss += loss
+        self.loss_count += 1
+
+
+        # 定期输出学习过程
+        if (iters+1) % 10 == 0:
+            avg_loss = self.total_loss / self.loss_count
+            print('| epoch %d |  iter %d / %d | loss %.2f'
+                  % (epoch + 1, iters + 1, max_iters, avg_loss))
+            self.loss_list.append(avg_loss.detach().numpy())
+            self.total_loss, self.loss_count = 0, 0
+
 
     def plot_progress(self):
-        df = pandas.DataFrame(self.progress, columns=['loss'])
-        df.plot(ylim=(0, 1.3), figsize=(16,8), alpha=0.3, 
-            marker='.', grid=True, yticks=(0, 0.25, 0.5, 0.75, 1, 1.25))
+        plt.plot(np.arange(len(self.loss_list)), self.loss_list, label='train')
+        plt.xlabel('iterations (x10)')
+        plt.ylabel('loss')
         plt.show()
