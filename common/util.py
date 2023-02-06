@@ -2,6 +2,15 @@ import torch
 import re
 
 def preprocess(text):
+    """对文本的预处理
+
+    Args:
+        text (string): 输入的单词文本。
+
+    Returns:
+        tuple: 第一个值为语料库，
+        第二个和第三个值都是字典，分别是用词获取id和用id获取词
+    """
     word_to_id = {}
     id_to_word = {}
 
@@ -45,3 +54,20 @@ def create_co_matrix(corpus, vocab_size, window_size=1):
                 co_matrix[word_id, right_word_id] += 1
 
     return co_matrix
+
+
+def cos_similarity(x, y, eps=1e-8):
+    """计算余弦相似度
+
+    Args:
+        x (_type_): 第一个向量
+        y (_type_): 第二个向量
+        eps (_type_, optional): 用于防止“除数为0”的微小值. Defaults to 1e-8.
+
+    Returns:
+        _type_: 余弦相似度
+    """
+
+    nx = x / (torch.sqrt(torch.sum(x ** 2)) + eps)
+    ny = y / (torch.sqrt(torch.sum(y ** 2)) + eps)
+    return torch.dot(nx, ny)
