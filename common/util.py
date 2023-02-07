@@ -71,3 +71,41 @@ def cos_similarity(x, y, eps=1e-8):
     nx = x / (torch.sqrt(torch.sum(x ** 2)) + eps)
     ny = y / (torch.sqrt(torch.sum(y ** 2)) + eps)
     return torch.dot(nx, ny)
+
+
+def most_similar(query, word_to_id, id_to_word, word_matrix, top=5):
+    '''相似单词的查找
+
+    :param query: 查询词
+    :param word_to_id: 从单词到单词ID的字典
+    :param id_to_word: 从单词ID到单词的字典
+    :param word_matrix: 汇总了单词向量的矩阵，假定保存了与各行对应的单词向量
+    :param top: 显示到前几位
+    '''
+    if query not in word_to_id:
+        print('%s is not found' % query)
+        return
+
+    # 1.取出查询词的单词向量。
+    print('\n[query] ' + query)
+    query_id = word_to_id[query]
+    query_vec = word_matrix[query_id]
+
+    vocab_size = len(id_to_word)
+
+    similarity = torch.zeros(vocab_size)
+    # 2.分别求得查询词的单词向量和其他所有单词向量的余弦相似度。
+    for i in range(vocab_size):
+        similarity[i] = cos_similarity(word_matrix[i], query_vec)
+
+    # 3.基于余弦相似度的结果，按降序显示它们的值。
+    count = 0
+    for i in (-1 * similarity).argsort():
+        i = i.item()
+        if id_to_word[i] == query:
+            continue
+        print(' %s: %s' % (id_to_word[i], similarity[i]))
+
+        count += 1
+        if count >= top:
+            return
