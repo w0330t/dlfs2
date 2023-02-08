@@ -109,3 +109,28 @@ def most_similar(query, word_to_id, id_to_word, word_matrix, top=5):
         count += 1
         if count >= top:
             return
+
+
+def ppmi(C, verbose=False, eps = 1e-8):
+    '''生成PPMI（正的点互信息）
+
+    :param C: 共现矩阵
+    :param verbose: 是否输出进展情况
+    :return:
+    '''
+    M = torch.zeros_like(C)
+    N = torch.sum(C)
+    S = torch.sum(C, dim=0)
+    total = C.shape[0] * C.shape[1]
+    cnt = 0
+
+    for i in range(C.shape[0]):
+        for j in range(C.shape[1]):
+            pmi = torch.log2(C[i, j] * N / (S[j]*S[i]) + eps)
+            M[i, j] = max(0, pmi)
+
+            if verbose:
+                cnt += 1
+                if cnt % (total//100 + 1) == 0:
+                    print('%.1f%% done' % (100*cnt/total))
+    return M
