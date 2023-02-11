@@ -134,3 +134,48 @@ def ppmi(C, verbose=False, eps = 1e-8):
                 if cnt % (total//100 + 1) == 0:
                     print('%.1f%% done' % (100*cnt/total))
     return M
+
+
+def create_contexts_target(corpus, window_size=1):
+    '''生成上下文和目标词
+
+    :param corpus: 语料库（单词ID列表）
+    :param window_size: 窗口大小（当窗口大小为1时，左右各1个单词为上下文）
+    :return:
+    '''
+    target = corpus[window_size:-window_size]
+    contexts = []
+
+    for idx in range(window_size, len(corpus)-window_size):
+        cs = []
+        for t in range(-window_size, window_size + 1):
+            if t == 0:
+                continue
+            cs.append(corpus[idx + t].item())
+        contexts.append(cs)
+
+    return torch.tensor(contexts), target
+
+
+def convert_one_hot(corpus, vocab_size):
+    '''转换为one-hot表示
+
+    :param corpus: 单词ID列表（一维或二维的NumPy数组）
+    :param vocab_size: 词汇个数
+    :return: one-hot表示（二维或三维的NumPy数组）
+    '''
+    N = corpus.shape[0]
+
+    if corpus.ndim == 1:
+        one_hot = torch.zeros((N, vocab_size))
+        for idx, word_id in enumerate(corpus):
+            one_hot[idx, word_id] = 1
+
+    elif corpus.ndim == 2:
+        C = corpus.shape[1]
+        one_hot = torch.zeros((N, C, vocab_size))
+        for idx_0, word_ids in enumerate(corpus):
+            for idx_1, word_id in enumerate(word_ids):
+                one_hot[idx_0, idx_1, word_id] = 1
+
+    return one_hot
