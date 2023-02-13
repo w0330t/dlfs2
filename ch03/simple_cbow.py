@@ -8,41 +8,25 @@ import matplotlib.pyplot as plt
 
 
 class SimpleCBOW(nn.Module):
-    # 判别器
 
     def __init__(self, 
-                 input_size, 
+                 vocab_size, 
                  hidden_size, 
-                 output_size, 
                  learning_rate = 0.01,
                  W1 = None, 
                  W2 = None):
         super().__init__()
         
-        # linear1 = nn.Linear(input_size, hidden_size)
-        # linear2 = nn.Linear(hidden_size, output_size)
 
-        # if W1 is not None and W2 is not None:
-        #     linear1.weight = Parameter(W1)
-        #     linear2.weight = Parameter(W2)
-        # linear1.bias = Parameter(torch.zeros(hidden_size))
-        # linear2.bias = Parameter(torch.zeros(output_size))
-
-        # 定义神经网络层
-        self.model = nn.Sequential(
-            linear1,
-            # nn.Sigmoid(),
-            nn.LeakyReLU(0.02),
-            linear2,
-            # nn.Softmax()
-        )
+        self.embedding = nn.Embedding(vocab_size, hidden_size)
+        self.linear = nn.Linear(hidden_size, vocab_size)
 
         # 初始损失函数
         self.loss_function = nn.CrossEntropyLoss()
         
         # 创建优化器, 使用随机梯度下降
-        self.optimiser = torch.optim.SGD(self.parameters(),lr=learning_rate)
-        # self.optimiser = torch.optim.Adam(self.parameters())
+        # self.optimiser = torch.optim.SGD(self.parameters(),lr=learning_rate)
+        self.optimiser = torch.optim.Adam(self.parameters())
 
         
         # 计数器和进程记录        
@@ -54,8 +38,9 @@ class SimpleCBOW(nn.Module):
 
 
     def forward(self, inputs):
-        # 直接运行模型
-        return self.model(inputs)
+        x = self.embedding(inputs).sum(dim=1)
+        x = self.linear(x)
+        return x
 
     
     def train(self, inputs, targets, iters, epoch, max_iters):
