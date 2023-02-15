@@ -110,6 +110,19 @@ class CrossEntropy:
         return self.t
 
 
+class Embedding:
+    def __init__(self, W):
+        self.params = [W]
+        self.grads = [torch.zeros_like(W)]
+        self.idx = None
+
+    def forward(self, idx):
+        W, = self.params
+        self.idx = idx
+        out = W[idx]
+        return out
+
+
 
 # test
 if __name__ == '__main__':
