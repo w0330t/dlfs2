@@ -48,8 +48,8 @@ offsets = [i * jump for i in range(batch_size)]
 for epoch in range(max_epoch):
     for iter in range(max_iters):
         # 2.获取mini-batch
-        batch_x = np.empty((batch_size, time_size), dtype='i')
-        batch_t = np.empty((batch_size, time_size), dtype='i')
+        batch_x = torch.empty((batch_size, time_size), dtype=torch.long)
+        batch_t = torch.empty((batch_size, time_size), dtype=torch.long)
         for t in range(time_size):
             for i, offset in enumerate(offsets):
                 batch_x[i, t] = xs[(offset + time_idx) % data_size]
