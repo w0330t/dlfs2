@@ -28,8 +28,9 @@ class SimpleRnnlm(nn.Module):
     def forward(self, xs, ts):
         xs = self.embed(xs)
         hs, _ = self.rnn(xs)
-        ys = self.softmax(self.out(hs))
-        loss = torch.mean(-torch.log(torch.gather(ys, 2, ts.view(-1, 1, 1))))
+        ys = self.out(hs)
+        # loss = nn.CrossEntropyLoss()(ys.view(-1, ys.size(2)), ts.view(-1))
+        loss = nn.CrossEntropyLoss(ys, ts)
         return loss
 
     def reset_state(self):
