@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 class SimpleRnnlm(nn.Module):
-    def __init__(self, vocab_size, wordvec_size, hidden_size):
+    def __init__(self, vocab_size, wordvec_size, hidden_size, learning_rate=0.1):
         super(SimpleRnnlm, self).__init__()
         self.hidden_size = hidden_size
 
@@ -22,6 +22,8 @@ class SimpleRnnlm(nn.Module):
                 nn.init.xavier_uniform_(param)
             self.params.append(param)
             self.grads.append(param.grad)
+
+        self.optimiser = torch.optim.SGD(self.parameters(),lr=learning_rate)
 
     def forward(self, xs, ts):
         xs = self.embed(xs)

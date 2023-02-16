@@ -95,3 +95,7 @@ API
 Training
 Blog
 About
+dataset/ptb.train.npy
+.gitignore
+dataset/ptb.train.txt
+dataset/ptb.vocab.pkl
