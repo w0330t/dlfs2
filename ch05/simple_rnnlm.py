@@ -12,6 +12,8 @@ class SimpleRnnlm(nn.Module):
         self.out = nn.Linear(hidden_size, vocab_size)
         self.softmax = nn.Softmax(dim=2)
 
+
+        self.loss = nn.CrossEntropyLoss()
         # 记录参数和梯度
         self.params, self.grads = [], []
         # 把所有的参数和迭代器遍历一遍，没有初始化的添加初始化，然后将参数全部存到上面两个值取
@@ -29,8 +31,10 @@ class SimpleRnnlm(nn.Module):
         xs = self.embed(xs)
         hs, _ = self.rnn(xs)
         ys = self.out(hs)
+        ys = ys.view(-1, ys.size(2))
+        ts = ts.view(-1).squeeze()
         # loss = nn.CrossEntropyLoss()(ys.view(-1, ys.size(2)), ts.view(-1))
-        loss = nn.CrossEntropyLoss(ys, ts)
+        loss = self.loss(ys, ts)
         return loss
 
     def reset_state(self):

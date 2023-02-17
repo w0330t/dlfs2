@@ -22,6 +22,7 @@ vocab_size = int(max(corpus) + 1)
 
 xs = corpus[:-1] # 输入
 ts = corpus[1:]  # 输出
+
 data_size = len(xs)
 # 单词数量和词汇数量
 print(f'corpus size: {corpus_size}, vocabulary size: {vocab_size}')
