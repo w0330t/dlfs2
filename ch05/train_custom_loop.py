@@ -1,10 +1,17 @@
 import sys, torch
 sys.path.append('.')
 
+from torch.nn.parameter import Parameter
 import matplotlib.pyplot as plt
 import numpy as np
 from dataset import ptb
 from simple_rnnlm import SimpleRnnlm
+from common.pickel_weight import *
+
+# 注册回调函数
+def print_grad(name, grad):
+    print('Gradient of', name, ':', grad)
+
 
 # 超参数
 batch_size = 10
@@ -16,7 +23,7 @@ max_epoch = 100
 
 # 读入学习数据（只有前面1000个）
 corpus, word_to_id, id_to_word = ptb.load_data('train')
-corpus_size = 1000
+corpus_size = 2000
 corpus = torch.from_numpy(corpus[:corpus_size])
 vocab_size = int(max(corpus) + 1)
 
@@ -41,6 +48,14 @@ model = SimpleRnnlm(vocab_size=vocab_size,
                     wordvec_size=wordvec_size,
                     hidden_size=hidden_size)
 
+
+# embed_W, rnn_Wx, rnn_Wh, affine_W = load_weight('dataset/rnnlm_init').values()
+# model.embed.weight = Parameter(torch.from_numpy(embed_W))
+# model.rnn.weight_ih_l0 = Parameter(torch.from_numpy(rnn_Wx).T)
+# model.rnn.weight_hh_l0 = Parameter(torch.from_numpy(rnn_Wh).T)
+# model.linear.weight = Parameter(torch.from_numpy(affine_W).T)
+
+
 # 1.计算读入mini-batch的各笔样本数据的开始位置
 jump = (corpus_size - 1) // batch_size
 offsets = [i * jump for i in range(batch_size)]
@@ -57,10 +72,27 @@ for epoch in range(max_epoch):
                 batch_t[i, t] = ts[(offset + time_idx) % data_size]
             time_idx += 1
 
-        # 计算梯度，更新参数
+        # 清空梯度，计算梯度，更新参数
         loss = model.forward(batch_x, batch_t)
+        model.optimizer.zero_grad()
+        
+        # handles = []
+        # for name, param in model.named_parameters():
+        #     if param.requires_grad:
+        #         handle = param.register_hook(lambda grad, name=name: print_grad(name, grad))
+        #         handles.append(handle)
+
+        # 开始反向传播
         loss.backward()
-        model.optimiser.step()
+
+        # 移除回调函数
+        # for handle in handles:
+        #     handle.remove()
+        
+        model.optimizer.step()
+
+        # 重置RNN的网络状态
+        model.reset_state()
 
         total_loss += loss
         loss_count += 1
