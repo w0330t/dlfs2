@@ -23,7 +23,7 @@ max_epoch = 100
 
 # 读入学习数据（只有前面1000个）
 corpus, word_to_id, id_to_word = ptb.load_data('train')
-corpus_size = 2000
+corpus_size = 1000
 corpus = torch.from_numpy(corpus[:corpus_size])
 vocab_size = int(max(corpus) + 1)
 
@@ -46,7 +46,7 @@ ppl_list = []
 # 生成模型 
 model = SimpleRnnlm(vocab_size=vocab_size,
                     wordvec_size=wordvec_size,
-                    hidden_size=hidden_size)
+                    hidden_size=hidden_size).cuda()
 
 
 # embed_W, rnn_Wx, rnn_Wh, affine_W = load_weight('dataset/rnnlm_init').values()
@@ -64,8 +64,8 @@ offsets = [i * jump for i in range(batch_size)]
 for epoch in range(max_epoch):
     for iter in range(max_iters):
         # 2.获取mini-batch
-        batch_x = torch.empty((batch_size, time_size), dtype=torch.long)
-        batch_t = torch.empty((batch_size, time_size), dtype=torch.long)
+        batch_x = torch.empty((batch_size, time_size), dtype=torch.long).cuda()
+        batch_t = torch.empty((batch_size, time_size), dtype=torch.long).cuda()
         for t in range(time_size):
             for i, offset in enumerate(offsets):
                 batch_x[i, t] = xs[(offset + time_idx) % data_size]
